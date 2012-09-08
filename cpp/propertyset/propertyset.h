@@ -88,6 +88,36 @@ namespace cadovvl{
 	
 	typedef Property_set<std::string> StringProperties;
 	
+	template <class KeyType>
+	class PropertyHelper_impl{
+		Property_set<KeyType>& property_set;
+		// should it be KeyType& ????
+		KeyType key;
+		public:
+		PropertyHelper_impl(Property_set<KeyType>& ps, KeyType k) : property_set(ps), key(k)
+		{}
+		template <class ValueType>
+		void operator=(ValueType value){
+			property_set.set_property(key, value);
+		}
+		template <class ValueType>
+		ValueType as(){
+			// FUCKING TEMPLATE!!!!
+			return property_set. template get_property<ValueType>(key);
+		}
+	};
+	
+	template <class KeyType>
+	class PropertyHelper{
+		Property_set<KeyType>& property_set;
+		public:
+		PropertyHelper(Property_set<KeyType>& propertySet) : property_set(propertySet){}
+		PropertyHelper_impl<KeyType> operator[](KeyType key){
+			return PropertyHelper_impl<KeyType>(property_set, key);
+		}
+	};
+	
+	
 };
 
 

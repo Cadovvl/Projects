@@ -34,7 +34,15 @@ int main(){
 	a.set_property("???", 13.1);
 	cout << a.get_property<double>("???") << endl;
 
-
+	PropertyHelper<string> ph(a);
+	
+	ph["int variable"] = 5;
+	cout << a.get_property<int>("int variable") << endl;
+	
+	ph["string variable"] = "Sample string";
+	string s = ph["string variable"].as<string>();
+	cout << s << endl;
+	
 
 	return 0;
 }
