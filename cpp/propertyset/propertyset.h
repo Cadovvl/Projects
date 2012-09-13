@@ -7,25 +7,29 @@
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
 #include <boost/shared_ptr.hpp>
-#include <iostream>
+
 
 namespace cadovvl{
-	//! Manipulator for internal 
+
+	//! Base manipulator for containing in map
 	struct Property_manipulator_t{
 		virtual ~Property_manipulator_t(){}
 	};
+	//! Manipulator, that provides getter function
 	template<class ValueType>
 	class Property_getter_manipulator_t : virtual public Property_manipulator_t{
 		public:
 		Property_getter_manipulator_t(boost::function< ValueType ( void ) > get_function) : getter(get_function) {} 
 		typename boost::function< ValueType ( void ) > getter;
 	};
+	//! Manipulator, that provides setter function
 	template<class ValueType>
 	class Property_setter_manipulator_t : virtual public Property_manipulator_t{
 		public:
 		Property_setter_manipulator_t(boost::function< void ( ValueType ) > set_function) : setter(set_function) {}
 		typename boost::function< void ( ValueType ) > setter;
 	};
+	//! Manipulator, that combine both setter and getter functions
 	template<class SetterValueType, class GetterValueType>
 	class Property_inheritance_manipulator_t : public Property_setter_manipulator_t<SetterValueType>, public Property_getter_manipulator_t<GetterValueType> {
 		public:
@@ -39,9 +43,12 @@ namespace cadovvl{
 	//! Property set with abstract KeyType
 	template<class KeyType>
 	class	Property_set{
+		// Manipulator containers
 		typename std::map<KeyType, boost::shared_ptr< Property_manipulator_t> > _inheritance_properties;
+		// Here unknown settings contains, using boost::lexical_cast
 		typename std::map<KeyType, std::string > _general_properties;
 		protected:
+		// Methods, that allows child class to set property functions on key_value
 		template <class GetterValueType, class SetterValueType>
 		void add_property(KeyType key, 
 			boost::function< void ( SetterValueType ) > set_function, 
@@ -59,6 +66,7 @@ namespace cadovvl{
 			_inheritance_properties[key] = boost::shared_ptr<Property_manipulator_t>( new Property_getter_manipulator_t<GetterValueType>(get_function));
 		}
 		public:
+		// property_access functions
 		template <class ValueType>
 		void set_property(KeyType key, ValueType value){
 			typename std::map<KeyType, boost::shared_ptr< Property_manipulator_t > >::iterator manipulator = _inheritance_properties.find(key);
@@ -88,6 +96,9 @@ namespace cadovvl{
 	
 	typedef Property_set<std::string> StringProperties;
 	
+	///////// propertyHelper section. \\\\\\\\\\\\
+	
+	//! feature for operator= realising
 	template <class KeyType>
 	class PropertyHelper_impl{
 		Property_set<KeyType>& property_set;
@@ -107,6 +118,11 @@ namespace cadovvl{
 		}
 	};
 	
+	//! General PropertyHelper implementation
+	/**
+	* Property helper is a feature for using operator[], which can't be done  
+	* 	in PropertySet because it makes impossible to override operator[] in derived class. 
+	*/
 	template <class KeyType>
 	class PropertyHelper{
 		Property_set<KeyType>& property_set;
