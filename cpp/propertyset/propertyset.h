@@ -39,8 +39,9 @@ namespace cadovvl{
 	//! Property set with abstract KeyType
 	template<class KeyType>
 	class	Property_set{
+		typedef std::string SuperType;
 		typename std::map<KeyType, boost::shared_ptr< Property_manipulator_t> > _inheritance_properties;
-		typename std::map<KeyType, std::string > _general_properties;
+		typename std::map<KeyType, SuperType > _general_properties;
 		protected:
 		template <class GetterValueType, class SetterValueType>
 		void add_property(KeyType key, 
@@ -70,7 +71,7 @@ namespace cadovvl{
 					return;
 				}
 			}
-			_general_properties[key] = boost::lexical_cast<std::string>(value);
+			_general_properties[key] = boost::lexical_cast<SuperType>(value);
 		}
 		template <class ValueType>
 		ValueType get_property(KeyType key){
@@ -116,8 +117,6 @@ namespace cadovvl{
 			return PropertyHelper_impl<KeyType>(property_set, key);
 		}
 	};
-	
-	
 };
 
 
