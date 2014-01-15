@@ -27,6 +27,7 @@ class A : public Property_set<std::string>{
 };
 
 int main(){
+	// new comment
 	A a;
 	a.set_property("int variable", 2);
 	cout << a.get_property<int>("int variable") << endl;
